@@ -1,0 +1,61 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int Poisk(const vector<long long>& arr, long long cel) {
+  int l = 0;
+  int r = (int)arr.size() - 1;
+  int answ = (int)arr.size();
+  while (l <= r) {
+    int mid = l + (r - l) / 2;
+    if (arr[mid] >= cel) {
+      answ = mid;
+      r = mid - 1;
+    } else {
+      l = mid + 1;
+    }
+  }
+  return answ;
+}
+
+int main() {
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+  int n;
+  cin >> n;
+  vector<long long> a(n);
+  vector<long long> b(n);
+  vector<long long> c(n);
+  for (int i = 0; i < n; ++i) {
+    cin >> a[i];
+  }
+  for (int i = 0; i < n; ++i) {
+    cin >> b[i];
+  }
+  for (int i = 0; i < n; ++i) {
+    c[i] = a[i] - b[i];
+  }
+  int q;
+  cin >> q;
+  for (int qi = 0; qi < q; ++qi) {
+    long long x;
+    cin >> x;
+    int k = Poisk(c, -x);
+    int answ_index;
+    if (k == 0) {
+      answ_index = 0;
+    } else if (k == n) {
+      answ_index = n - 1;
+    } else {
+      long long val_left = b[k - 1];
+      long long val_right = a[k] + x;
+      if (val_left <= val_right) {
+        answ_index = k - 1;
+      } else {
+        answ_index = k;
+      }
+    }
+    cout << (answ_index + 1) << "\n";
+  }
+  return 0;
+}
