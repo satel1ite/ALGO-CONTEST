@@ -4,18 +4,16 @@ using namespace std;
 
 int BinarySearch(const vector<long long>& arr, long long cel) {
   int l = 0;
-  int r = (int)arr.size() - 1;
-  int answ = (int)arr.size();
-  while (l <= r) {
+  int r = (int)arr.size();
+  while (l < r) {
     int mid = l + (r - l) / 2;
     if (arr[mid] >= cel) {
-      answ = mid;
       r = mid;
     } else {
-      l = mid;
+      l = mid + 1;
     }
   }
-  return answ;
+  return l;
 }
 
 int main() {
