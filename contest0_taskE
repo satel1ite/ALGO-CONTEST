@@ -2,7 +2,7 @@
 #include <vector>
 using namespace std;
 
-int Poisk(const vector<long long>& arr, long long cel) {
+int BinarySearch(const vector<long long>& arr, long long cel) {
   int l = 0;
   int r = (int)arr.size() - 1;
   int answ = (int)arr.size();
@@ -10,9 +10,9 @@ int Poisk(const vector<long long>& arr, long long cel) {
     int mid = l + (r - l) / 2;
     if (arr[mid] >= cel) {
       answ = mid;
-      r = mid - 1;
+      r = mid;
     } else {
-      l = mid + 1;
+      l = mid;
     }
   }
   return answ;
@@ -40,7 +40,7 @@ int main() {
   for (int qi = 0; qi < q; ++qi) {
     long long x;
     cin >> x;
-    int k = Poisk(c, -x);
+    int k = BinarySearch(c, -x);
     int answ_index;
     if (k == 0) {
       answ_index = 0;
