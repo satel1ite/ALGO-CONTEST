@@ -36,7 +36,7 @@ int main() {
   int l = 0;
   int r = n;
   int ans = 0;
-  while (l <= r) {
+  while (l+1 <= r) {
     int mid = (l + r) / 2;
     if (Check(mid)) {
       ans = mid;
