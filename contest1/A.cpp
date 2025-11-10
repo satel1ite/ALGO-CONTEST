@@ -46,37 +46,37 @@ void MergeSort(vector<pair<int, int>>& a, int l, int r) {
 }
 
 int main() {
-  int n;
-  cin >> n;
+    int n;
+    cin >> n;
 
-  vector<pair<int, int>> segs(n);
-  for (int i = 0; i < n; i++) {
-    cin >> segs[i].first >> segs[i].second;
-  }
-
-  MergeSort(segs, 0, n - 1);
-
-  vector<pair<int, int>> res;
-  int s = segs[0].first;
-  int e = segs[0].second;
-
-  for (int i = 1; i < n; i++) {
-    if (segs[i].first <= e) {
-      if (segs[i].second > e) {
-        e = segs[i].second;
-      }
-    } else {
-      res.push_back({s, e});
-      s = segs[i].first;
-      e = segs[i].second;
+    vector<pair<int, int>> segs(n);
+    for (int i = 0; i < n; i++) {
+        cin >> segs[i].first >> segs[i].second;
     }
-  }
-  res.push_back({s, e});
 
-  cout << res.size() << endl;
-  for (auto seg : res) {
-    cout << seg.first << " " << seg.second << endl;
-  }
+    MergeSort(segs, 0, n - 1);
 
-  return 0;
+    vector<pair<int, int>> res;
+    int start = segs[0].first;
+    int end = segs[0].second;
+
+    for (int i = 1; i < n; i++) {
+        if (segs[i].first <= end) {
+            if (segs[i].second > end) {
+                end = segs[i].second;
+            }
+        } else {
+            res.push_back({start, end});
+            start = segs[i].first;
+            end = segs[i].second;
+        }
+    }
+    res.push_back({start, end});
+
+    cout << res.size() << endl;
+    for (auto seg : res) {
+        cout << seg.first << " " << seg.second << endl;
+    }
+
+    return 0;
 }
