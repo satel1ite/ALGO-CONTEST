@@ -1,0 +1,50 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+string s, t;
+vector<int> p;
+
+bool Check(int k) {
+  int n = static_cast<int>(s.size());
+  vector<bool> is_removed(n, false);
+  for (int i = 0; i < k; i++) {
+    is_removed[p[i] - 1] = true;
+  }
+  int j = 0;
+  int m = static_cast<int>(t.size());
+  for (int i = 0; i < n && j < m; i++) {
+    if (!is_removed[i] && s[i] == t[j]) {
+      j++;
+    }
+  }
+  return j == m;
+}
+
+int main() {
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+
+  cin >> s >> t;
+  int n = static_cast<int>(s.size());
+  p.resize(n);
+  for (int i = 0; i < n; i++) {
+    cin >> p[i];
+  }
+
+  int l = 0;
+  int r = n;
+  int ans = 0;
+  while (l+1 <= r) {
+    int mid = (l + r) / 2;
+    if (Check(mid)) {
+      ans = mid;
+      l = mid;
+    } else {
+      r = mid;
+    }
+  }
+  cout << ans << "\n";
+  return 0;
+}
