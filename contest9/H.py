@@ -2,88 +2,113 @@ import sys
 from collections import deque
 
 
-def add_edge(graph, edges, u, v, cap, original_id):
-    id_direct = len(edges)
-    edges.append([u, v, cap, 0, original_id, id_direct + 1])
-    edges.append([v, u, 0, 0, -1, id_direct])
-    graph[u].append(id_direct)
-    graph[v].append(id_direct + 1)
+class Edge:
+    __slots__ = ('fr', 'to', 'cap', 'flow', 'orig', 'rev')
 
-
-def bfs(n, graph, edges, level, delta):
-    for i in range(n + 1):
-        level[i] = -1
-    level[1] = 0
-    q = deque([1])
-    while q:
-        u = q.popleft()
-        for edge_id in graph[u]:
-            e = edges[edge_id]
-            v = e[1]
-            if level[v] == -1 and e[2] - e[3] >= delta:
-                level[v] = level[u] + 1
-                q.append(v)
-    return level[n] != -1
-
-
-def dfs(u, min_cap, n, graph, edges, level, ptr, delta):
-    if u == n:
-        return min_cap
-    while ptr[u] < len(graph[u]):
-        edge_id = graph[u][ptr[u]]
-        e = edges[edge_id]
-        v = e[1]
-        if level[v] != level[u] + 1 or e[2] - e[3] < delta:
-            ptr[u] += 1
-            continue
-        new_cap = min(min_cap, e[2] - e[3])
-        pushed = dfs(v, new_cap, n, graph, edges, level, ptr, delta)
-        if pushed > 0:
-            e[3] += pushed
-            edges[e[5]][3] -= pushed
-            return pushed
-        ptr[u] += 1
-    return 0
+    def __init__(self, fr, to, cap, flow, orig, rev):
+        self.fr = fr
+        self.to = to
+        self.cap = cap
+        self.flow = flow
+        self.orig = orig
+        self.rev = rev
 
 
 sys.setrecursionlimit(10000)
+
+
+def add_edge(u, v, c, orig_id):
+    eid = len(edges)
+    edges.append(Edge(u, v, c, 0, orig_id, eid + 1))
+    edges.append(Edge(v, u, 0, 0, -1, eid))
+    graph[u].append(eid)
+    graph[v].append(eid + 1)
+
+
+def bfs(delta):
+    k = 0
+    while k <= n:
+        level[k] = -1
+        k += 1
+    level[1] = 0
+    bq = deque()
+    bq.append(1)
+    while bq:
+        u = bq.popleft()
+        for eid in graph[u]:
+            e = edges[eid]
+            w = e.to
+            if level[w] == -1 and e.cap - e.flow >= delta:
+                level[w] = level[u] + 1
+                bq.append(w)
+    return level[n] != -1
+
+
+def dfs(u, min_cap, ptr_arr, delta):
+    if u == n:
+        return min_cap
+    while ptr_arr[u] < len(graph[u]):
+        eid = graph[u][ptr_arr[u]]
+        e = edges[eid]
+        w = e.to
+        residual = e.cap - e.flow
+        if level[w] != level[u] + 1 or residual < delta:
+            ptr_arr[u] += 1
+            continue
+        new_cap = min_cap if min_cap < residual else residual
+        pushed = dfs(w, new_cap, ptr_arr, delta)
+        if pushed > 0:
+            e.flow += pushed
+            edges[e.rev].flow -= pushed
+            return pushed
+        ptr_arr[u] += 1
+    return 0
+
+
 data = sys.stdin.buffer.read().split()
-idx = 0
-n = int(data[idx])
-idx += 1
-m = int(data[idx])
-idx += 1
+ptr_in = 0
+n = int(data[ptr_in])
+ptr_in += 1
+m = int(data[ptr_in])
+ptr_in += 1
+
 edges = []
 graph = [[] for _ in range(n + 1)]
-for i in range(m):
-    u = int(data[idx])
-    idx += 1
-    v = int(data[idx])
-    idx += 1
-    c = int(data[idx])
-    idx += 1
-    add_edge(graph, edges, u, v, c, i)
+
+i = 0
+while i < m:
+    u = int(data[ptr_in])
+    ptr_in += 1
+    v = int(data[ptr_in])
+    ptr_in += 1
+    c = int(data[ptr_in])
+    ptr_in += 1
+    add_edge(u, v, c, i)
+    i += 1
 
 level = [-1] * (n + 1)
+
 max_flow = 0
 delta = 1 << 30
-INF = float('inf')
+INF = 1 << 60
+
 while delta > 0:
-    while bfs(n, graph, edges, level, delta):
-        ptr = [0] * (n + 1)
+    while bfs(delta):
+        ptr_arr = [0] * (n + 1)
         while True:
-            pushed = dfs(1, INF, n, graph, edges, level, ptr, delta)
+            pushed = dfs(1, INF, ptr_arr, delta)
             if pushed == 0:
                 break
             max_flow += pushed
-    delta //= 2
+    delta >>= 1
 
 ans = [0] * m
 for e in edges:
-    if e[4] != -1:
-        ans[e[4]] = e[3]
+    if e.orig != -1:
+        ans[e.orig] = e.flow
 
-out = [str(max_flow)]
+out = []
+out.append(str(max_flow))
 for x in ans:
     out.append(str(x))
 sys.stdout.write('\n'.join(out) + '\n')
